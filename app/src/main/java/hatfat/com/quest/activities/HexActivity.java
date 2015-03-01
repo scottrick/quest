@@ -1,75 +1,62 @@
 package hatfat.com.quest.activities;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.RelativeLayout;
 
 import com.hatfat.agl.app.AglActivity;
-import com.hatfat.agl.util.AglRandom;
-import com.hatfat.agl.util.Vec3;
 
-import javax.inject.Inject;
-
-import test.TestScene;
+import hatfat.com.quest.hex.HexPlanetScene;
 
 public class HexActivity extends AglActivity implements View.OnTouchListener {
 
-    @Inject
-    AglRandom rand;
+    private float touchPreviousX;
+    private float touchPreviousY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final TestScene aglScene = new TestScene(getApplicationContext());
-        aglSurfaceView.setScene(aglScene);
+        final HexPlanetScene planetScene = new HexPlanetScene(getApplicationContext());
+        aglSurfaceView.setScene(planetScene);
 
         aglSurfaceView.setOnTouchListener(this);
 
+        //put any subviews in this container view
         RelativeLayout container = (RelativeLayout) findViewById(com.hatfat.agl.R.id.base_layout_content_view);
-        View ourView = getLayoutInflater().inflate(com.hatfat.agl.R.layout.test_activity_layout, container, false);
-        container.addView(ourView);
-
-        Button testButton = (Button) ourView.findViewById(com.hatfat.agl.R.id.test_activity_layout_button);
-        testButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getScene().getGlobalLight().lightColor = rand.nextColor();
-            }
-        });
-
-        Button meshButton = (Button) ourView.findViewById(com.hatfat.agl.R.id.test_activity_layout_toggle_button);
-        meshButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                aglScene.toggleMesh();
-            }
-        });
     }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                touchPreviousX = event.getX();
+                touchPreviousY = event.getY();
+                Log.e("catfat", "down!");
+                break;
             case MotionEvent.ACTION_UP:
+                touchPreviousX = 0.0f;
+                touchPreviousY = 0.0f;
+                Log.e("catfat", "up!");
+                break;
             case MotionEvent.ACTION_MOVE: {
-                float halfWidth = aglSurfaceView.getWidth() / 2.0f;
-                float halfHeight = aglSurfaceView.getHeight() / 2.0f;
-                float scale = 1.0f;
 
-                float xValue = (event.getX() - halfWidth) / halfWidth * scale;
-                float yValue = (event.getY() - halfHeight) / halfHeight * scale;
+                float currentX = event.getX();
+                float currentY = event.getY();
 
-                Vec3 lightDir = getScene().getGlobalLight().lightDir;
-                lightDir.x = xValue;
-                lightDir.y = -yValue;
-                lightDir.z = 1.0f;
+                handleTouchDrag(currentX - touchPreviousX, currentY - touchPreviousY);
+                touchPreviousX = currentX;
+                touchPreviousY = currentY;
             }
             break;
         }
 
         return true;
+    }
+
+    private void handleTouchDrag(float dx, float dy) {
+        Log.e("catfat", "drag (" + dx + ", " + dy + ")");
     }
 }
