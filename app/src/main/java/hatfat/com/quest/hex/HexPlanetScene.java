@@ -9,18 +9,21 @@ import com.hatfat.agl.util.Vec3;
 
 import hatfat.com.quest.cameras.HexPlanetCamera;
 import hatfat.com.quest.planet.HexPlanet;
+import hatfat.com.quest.planet.HexTile;
 
 public class HexPlanetScene extends AglScene {
 
     private HexPlanet planet;
 
     private int planetLevel;
+    private boolean meshInitiallyVisible;
     private boolean wireframeInitiallyVisible;
 
-    public HexPlanetScene(Context context, int planetLevel, boolean wireframeInitiallyVisible) {
+    public HexPlanetScene(Context context, int planetLevel, boolean meshInitiallyVisible, boolean wireframeInitiallyVisible) {
         super(context);
 
         this.planetLevel = planetLevel;
+        this.meshInitiallyVisible = meshInitiallyVisible;
         this.wireframeInitiallyVisible = wireframeInitiallyVisible;
 
         HexPlanetCamera camera = new HexPlanetCamera();
@@ -44,6 +47,7 @@ public class HexPlanetScene extends AglScene {
         getCamera().setPlanet(planet);
         addNodes(planet.getNodes());
 
+        planet.getMeshNode().setShouldRender(meshInitiallyVisible);
         planet.getWireframeNode().setShouldRender(wireframeInitiallyVisible);
 
         long setupEndTime = System.currentTimeMillis();
@@ -59,6 +63,11 @@ public class HexPlanetScene extends AglScene {
         GLES20.glDisable(GLES20.GL_POLYGON_OFFSET_FILL);
     }
 
+    public void focusTile(HexTile tile) {
+        getCamera().setFocusOnTile(tile);
+        planet.setHighlightTile(tile);
+    }
+
     public HexPlanetCamera getCamera() {
         return (HexPlanetCamera) super.getCamera();
     }
@@ -67,9 +76,24 @@ public class HexPlanetScene extends AglScene {
         return planet;
     }
 
+    public void toggleMesh() {
+        if (planet != null) {
+            planet.getMeshNode().setShouldRender(!isMeshVisible());
+        }
+    }
+
     public void toggleWireframe() {
         if (planet != null) {
             planet.getWireframeNode().setShouldRender(!isWireframeVisible());
+        }
+    }
+
+    public boolean isMeshVisible() {
+        if (planet != null) {
+            return planet.getMeshNode().shouldRender();
+        }
+        else {
+            return meshInitiallyVisible;
         }
     }
 

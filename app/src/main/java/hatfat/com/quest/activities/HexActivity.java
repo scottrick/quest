@@ -28,11 +28,13 @@ public class HexActivity extends AglActivity {
     private HexPlanetScene planetScene;
 
     private Button generateButton;
+    private Button meshButton;
     private Button wireframeButton;
     private Button focusButton;
     private TextView levelTextView;
     private SeekBar seekBar;
 
+    private boolean isShowingMesh = true;
     private boolean isShowingWireframe = true;
 
     @Inject AglRandom random;
@@ -52,8 +54,15 @@ public class HexActivity extends AglActivity {
             @Override public void onClick(View v) {
                 int newLevel = seekBar.getProgress() + 1;
                 levelTextView.setText("level " + newLevel);
-                HexPlanetScene newPlanetScene = new HexPlanetScene(getApplicationContext(), newLevel, isShowingWireframe);
+                HexPlanetScene newPlanetScene = new HexPlanetScene(getApplicationContext(), newLevel, isShowingMesh, isShowingWireframe);
                 setPlanetScene(newPlanetScene);
+            }
+        });
+
+        meshButton = (Button) ourView.findViewById(R.id.activity_test_layout_mesh_button);
+        meshButton.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                toggleMesh();
             }
         });
 
@@ -67,10 +76,14 @@ public class HexActivity extends AglActivity {
         focusButton = (Button) ourView.findViewById(R.id.activity_test_layout_focus_button);
         focusButton.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
+                if (planetScene.getPlanet() == null) {
+                    return;
+                }
+
                 List<HexTile> tiles = planetScene.getPlanet().getTiles();
                 int randomTileIndex = random.get().nextInt(tiles.size());
                 HexTile randomTile = tiles.get(randomTileIndex);
-                planetScene.getCamera().setFocusOnTile(randomTile);
+                planetScene.focusTile(randomTile);
             }
         });
 
@@ -82,7 +95,7 @@ public class HexActivity extends AglActivity {
                     boolean fromUser) {
                 int newLevel = progress + 1;
                 levelTextView.setText("level " + newLevel);
-                HexPlanetScene newPlanetScene = new HexPlanetScene(getApplicationContext(), newLevel, isShowingWireframe);
+                HexPlanetScene newPlanetScene = new HexPlanetScene(getApplicationContext(), newLevel, isShowingMesh, isShowingWireframe);
                 setPlanetScene(newPlanetScene);
             }
 
@@ -127,6 +140,22 @@ public class HexActivity extends AglActivity {
                 return true;
             }
         });
+    }
+
+    private void toggleMesh() {
+        planetScene.toggleMesh();
+        updateMeshButton();
+    }
+
+    private void updateMeshButton() {
+        isShowingMesh = planetScene.isMeshVisible();
+
+        if (planetScene.isWireframeVisible()) {
+            wireframeButton.setText("wire on");
+        }
+        else {
+            wireframeButton.setText("wire off");
+        }
     }
 
     private void toggleWireframe() {

@@ -9,6 +9,7 @@ import com.hatfat.agl.AglWireframe;
 import com.hatfat.agl.app.AglApplication;
 import com.hatfat.agl.mesh.AglBBMesh;
 import com.hatfat.agl.mesh.AglMesh;
+import com.hatfat.agl.mesh.AglPoint;
 import com.hatfat.agl.mesh.AglShape;
 import com.hatfat.agl.util.AglRandom;
 import com.hatfat.agl.util.Color;
@@ -27,6 +28,7 @@ public class HexPlanet {
 
     private AglNode meshNode = null;
     private AglNode wireframeNode = null;
+    private AglNode highlightNode = null;
 
     private AglBBMesh shapeMesh = null;
 
@@ -68,15 +70,19 @@ public class HexPlanet {
 
             AglWireframe wireframeRenderable = shapeMesh.toWireframeRenderable();
             wireframeRenderable.setLineWidth(2.0f);
+            wireframeRenderable.setWireframeColor(new Color(0.15f, 0.15f, 0.15f, 1.0f));
             AglColoredGeometry coloredRenderable = toColoredGeometryRenderable();
+
+            AglWireframe highlightWireframeRenderable = makeHighlightRenderableWireframe();
 
             meshNode = new AglNode(new Vec3(0.0f, 0.0f, 0.0f), coloredRenderable);
             wireframeNode = new AglNode(new Vec3(0.0f, 0.0f, 0.0f), wireframeRenderable);
+            highlightNode = new AglNode(new Vec3(0.0f, 0.0f, 0.0f), highlightWireframeRenderable);
+            highlightNode.setScale(new Vec3(1.01f, 1.01f, 1.01f));
         }
     }
 
     private void generateTestTerrain(int planetLevel) {
-
         long generateStartTime = System.currentTimeMillis();
 
         //set starting seed tiles
@@ -166,9 +172,9 @@ public class HexPlanet {
 
             //color the center a little brighter for now
             int index = tile.getShape().getCenterIndex();
-            newVertices[index * 10 + 3] = tileColor.r * 1.1f;
-            newVertices[index * 10 + 4] = tileColor.g * 1.1f;
-            newVertices[index * 10 + 5] = tileColor.b * 1.1f;
+            newVertices[index * 10 + 3] = tileColor.r * 1.15f;
+            newVertices[index * 10 + 4] = tileColor.g * 1.15f;
+            newVertices[index * 10 + 5] = tileColor.b * 1.15f;
             newVertices[index * 10 + 6] = tileColor.a;
         }
 
@@ -189,6 +195,42 @@ public class HexPlanet {
         }
 
         return new AglColoredGeometry(newVertices, numVertices, elements, elements.length);
+    }
+
+    public void setHighlightTile(HexTile tile) {
+        int numVertices = 6;
+        float[] vertices = new float[numVertices * 3];
+
+        for (int i = 0; i < numVertices; i++) {
+            int vertexIndex = tile.getShape().getOuterPoint(i % tile.getShape().getNumberOfSides());
+            AglPoint point = shapeMesh.getPoints().get(vertexIndex);
+
+            vertices[(i * 3) + 0] = point.p.x;
+            vertices[(i * 3) + 1] = point.p.y;
+            vertices[(i * 3) + 2] = point.p.z;
+        }
+
+        AglWireframe wireframe = (AglWireframe) highlightNode.getRenderable();
+        wireframe.updateWithVertices(vertices, numVertices);
+    }
+
+    public AglWireframe makeHighlightRenderableWireframe() {
+        int numVertices = 6;
+
+        float[] vertices = new float[numVertices * 3];
+        int[] indices = new int[numVertices * 2];
+
+        for (int i = 0; i < numVertices; i++) {
+            indices[(i * 2) + 0] = (i + 0) % numVertices;
+            indices[(i * 2) + 1] = (i + 1) % numVertices;
+        }
+
+        AglWireframe wireframe = new AglWireframe(vertices, numVertices, indices, numVertices * 2);
+
+        wireframe.setLineWidth(4.0f);
+        wireframe.setWireframeColor(new Color(0.9f, 0.85f, 0.15f, 1.0f));
+
+        return wireframe;
     }
 
     private void setMeshNode(AglNode meshNode) {
@@ -215,6 +257,7 @@ public class HexPlanet {
         List<AglNode> nodes = new LinkedList<>();
         nodes.add(meshNode);
         nodes.add(wireframeNode);
+        nodes.add(highlightNode);
 
         return nodes;
     }

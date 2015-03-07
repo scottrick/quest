@@ -40,7 +40,15 @@
 
         <Button
                 android:id="@+id/activity_test_layout_generate_button"
-                android:text="generate"
+                android:text="gen"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="44dp"/>
+
+        <Button
+                android:id="@+id/activity_test_layout_mesh_button"
+                android:text="mesh on"
                 android:gravity="center"
                 android:layout_weight="1"
                 android:layout_width="0dp"
