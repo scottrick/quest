@@ -105,8 +105,8 @@ public class HexTile {
     public void assignRandomBaseType(final AglRandom random) {
         float value = random.get().nextFloat();
 
-        //66% land
-        if (value < 0.666f) {
+        //60% land
+        if (value < 0.6f) {
             this.type = HexTileType.LAND;
         }
         else {

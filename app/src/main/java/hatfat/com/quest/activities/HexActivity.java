@@ -132,7 +132,6 @@ public class HexActivity extends AglActivity {
         });
 
         final ScaleGestureDetector scaleDetector = new ScaleGestureDetector(this, planetScene.getCamera());
-
         aglSurfaceView.setOnTouchListener(new View.OnTouchListener() {
             @Override public boolean onTouch(View v, MotionEvent event) {
                 gestureDetector.onTouchEvent(event);
