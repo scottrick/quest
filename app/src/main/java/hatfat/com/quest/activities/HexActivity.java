@@ -150,11 +150,11 @@ public class HexActivity extends AglActivity {
     private void updateMeshButton() {
         isShowingMesh = planetScene.isMeshVisible();
 
-        if (planetScene.isWireframeVisible()) {
-            wireframeButton.setText("wire on");
+        if (planetScene.isMeshVisible()) {
+            meshButton.setText("mesh on");
         }
         else {
-            wireframeButton.setText("wire off");
+            meshButton.setText("mesh off");
         }
     }
 
