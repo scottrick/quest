@@ -78,7 +78,7 @@ public class HexPlanet {
             meshNode = new AglNode(new Vec3(0.0f, 0.0f, 0.0f), coloredRenderable);
             wireframeNode = new AglNode(new Vec3(0.0f, 0.0f, 0.0f), wireframeRenderable);
             highlightNode = new AglNode(new Vec3(0.0f, 0.0f, 0.0f), highlightWireframeRenderable);
-            highlightNode.setScale(new Vec3(1.01f, 1.01f, 1.01f));
+            highlightNode.setScale(new Vec3(1.002f, 1.002f, 1.002f));
         }
     }
 
