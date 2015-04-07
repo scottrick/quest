@@ -31,6 +31,7 @@
     </RelativeLayout>
 
     <LinearLayout
+            android:id="@+id/activity_test_layout_bottom_container"
             android:padding="@dimen/default_padding"
             android:layout_alignParentBottom="true"
             android:baselineAligned="false"
@@ -75,5 +76,69 @@
                 android:layout_height="44dp"/>
 
     </LinearLayout>
+
+    <RelativeLayout
+            android:background="#7f000000"
+            android:layout_above="@id/activity_test_layout_bottom_container"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/default_padding"
+            android:padding="@dimen/default_padding"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content">
+
+        <TextView
+                android:id="@+id/activity_test_layout_type_label"
+                android:text="Type:"
+                android:textColor="@color/off_white"
+                android:layout_marginRight="@dimen/default_padding"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+        <TextView
+                android:id="@+id/activity_test_layout_neighbors_label"
+                android:layout_below="@id/activity_test_layout_type_label"
+                android:text="Neighbors:"
+                android:textColor="@color/off_white"
+                android:layout_marginRight="@dimen/default_padding"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+        <TextView
+                android:id="@+id/activity_test_layout_contents_label"
+                android:layout_below="@id/activity_test_layout_neighbors_label"
+                android:text="Contents:"
+                android:textColor="@color/off_white"
+                android:layout_marginRight="@dimen/default_padding"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+        <TextView
+                android:id="@+id/activity_test_layout_desc1_textview"
+                android:layout_toRightOf="@id/activity_test_layout_type_label"
+                android:gravity="right"
+                android:textColor="@color/off_white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        <TextView
+                android:id="@+id/activity_test_layout_desc2_textview"
+                android:layout_below="@id/activity_test_layout_desc1_textview"
+                android:layout_toRightOf="@id/activity_test_layout_neighbors_label"
+                android:gravity="right"
+                android:textColor="@color/off_white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        <TextView
+                android:id="@+id/activity_test_layout_desc3_textview"
+                android:layout_below="@id/activity_test_layout_desc2_textview"
+                android:layout_toRightOf="@id/activity_test_layout_contents_label"
+                android:gravity="right"
+                android:textColor="@color/off_white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+
+    </RelativeLayout>
 
 </RelativeLayout>

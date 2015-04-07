@@ -1,6 +1,7 @@
 package hatfat.com.quest.cameras;
 
 import android.view.GestureDetector;
+import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 
@@ -8,7 +9,6 @@ import com.hatfat.agl.AglNode;
 import com.hatfat.agl.AglOrthographicCamera;
 import com.hatfat.agl.mesh.AglPoint;
 import com.hatfat.agl.util.Quat;
-import com.hatfat.agl.util.Util;
 import com.hatfat.agl.util.Vec3;
 
 import hatfat.com.quest.planet.HexPlanet;
@@ -60,17 +60,15 @@ public class HexPlanetCamera extends AglOrthographicCamera implements GestureDet
 
         Vec3 eye = new Vec3(0.0f, 0.0f, 1.0f);
         Vec3 axis = Vec3.crossProduct(eye, target);
+        axis.normalize();
         float angleRadians = - Vec3.calculateAngleRadians(eye, target);
 
         Quat rotation = new Quat();
-        if (axis.getMagnitude() > Util.NORMALIZATION_ALLOWABLE_ERROR) {
-            rotation.setWithRotationInRadians(angleRadians, axis);
-            rotation.normalize();
-        }
+        rotation.setWithRotationInRadians(angleRadians, axis);
 
         if (planet != null) {
             for (AglNode node : planet.getNodes()) {
-                node.posQuat.quat = rotation;
+                node.posQuat.quat = new Quat(rotation);
             }
         }
     }
@@ -83,7 +81,6 @@ public class HexPlanetCamera extends AglOrthographicCamera implements GestureDet
         axis.normalize();
 
         rotation.setWithRotationInDegrees(magnitude / 20.0f, axis);
-        rotation.normalize();
 
         if (planet != null) {
             for (AglNode node : planet.getNodes()) {
@@ -102,6 +99,41 @@ public class HexPlanetCamera extends AglOrthographicCamera implements GestureDet
     }
 
     @Override public boolean onSingleTapUp(MotionEvent e) {
+        InputDevice.MotionRange rangeX = e.getDevice().getMotionRange(MotionEvent.AXIS_X);
+        InputDevice.MotionRange rangeY = e.getDevice().getMotionRange(MotionEvent.AXIS_Y);
+
+        float xRange = rangeX.getRange();
+        float yRange = rangeY.getRange();
+
+        float percentX = e.getX() / xRange;
+        float percentY = e.getY() / yRange;
+
+        float xValue = getLeft() + getWidth() * percentX;
+        float yValue = getTop() - getHeight() * percentY;
+
+        //sphere:   x^2 + y^2 + z^2 = r^2
+        //radius is always 1, so:
+        //          x^2 + y^2 + z^2 = 1
+        //          z^2 = 1 - x^2 - y^2
+
+        float zSquared = 1.0f - xValue * xValue - yValue * yValue;
+        float zValue = (float)Math.sqrt(zSquared);
+
+        if (Float.isNaN(zValue) || Float.isInfinite(zValue)) {
+            //didn't click on the sphere!
+            planet.setHighlightTile(null);
+            return true;
+        }
+
+        Vec3 point = new Vec3(xValue, yValue, zValue);
+
+        //need to ROTATE point
+        point.rotateBy(planet.getMeshNode().posQuat.quat.getInverse());
+
+        HexTile focusTile = planet.findTileClosestToPoint(point);
+
+        planet.setHighlightTile(focusTile);
+
         return true;
     }
 

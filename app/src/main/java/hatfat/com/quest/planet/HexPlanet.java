@@ -14,11 +14,13 @@ import com.hatfat.agl.mesh.AglShape;
 import com.hatfat.agl.util.AglRandom;
 import com.hatfat.agl.util.Color;
 import com.hatfat.agl.util.Vec3;
+import com.squareup.otto.Bus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -33,7 +35,9 @@ public class HexPlanet {
     private AglBBMesh shapeMesh = null;
 
     @Inject HexMeshManager meshManager;
+    @Inject Bus bus;
 
+    private HexTile highlightTile = null;
     private List<HexTile> tiles = new ArrayList<>();
     private HashMap<AglShape, HexTile> shapeTileMap;
 
@@ -136,6 +140,33 @@ public class HexPlanet {
         Log.i("HexPlanet", "[" + planetLevel + "] generateTestTerrain took " + (generateEndTime - generateStartTime) + " milliseconds.");
     }
 
+    public HexTile findTileClosestToPoint(Vec3 point) {
+        HexTile currentBest = tiles.get(0);
+        HexTile nextBest = null;
+
+        while (currentBest != nextBest) {
+            nextBest = currentBest;
+
+            ArrayList<AglPoint> points = shapeMesh.getPoints();
+
+            float bestDist = Vec3.calculateDistanceSquared(point,
+                    points.get(currentBest.getShape().getCenterIndex()).p);
+
+            Set<HexTile> neighbors = currentBest.getNeighbors();
+
+            for (HexTile tile : neighbors) {
+                float testDist = Vec3.calculateDistanceSquared(point,
+                        points.get(tile.getShape().getCenterIndex()).p);
+
+                if (testDist < bestDist) {
+                    currentBest = tile;
+                }
+            }
+        }
+
+        return currentBest;
+    }
+
     private AglColoredGeometry toColoredGeometryRenderable() {
         float[] vertices = shapeMesh.getVertexArray();
         int numVertices = shapeMesh.getNumVertices();
@@ -198,20 +229,40 @@ public class HexPlanet {
     }
 
     public void setHighlightTile(HexTile tile) {
+        if (highlightTile == tile) {
+            return;
+        }
+
+        highlightTile = tile;
+
         int numVertices = 6;
         float[] vertices = new float[numVertices * 3];
 
         for (int i = 0; i < numVertices; i++) {
-            int vertexIndex = tile.getShape().getOuterPoint(i % tile.getShape().getNumberOfSides());
-            AglPoint point = shapeMesh.getPoints().get(vertexIndex);
+            if (tile != null) {
+                int vertexIndex = tile.getShape()
+                        .getOuterPoint(i % tile.getShape().getNumberOfSides());
+                AglPoint point = shapeMesh.getPoints().get(vertexIndex);
 
-            vertices[(i * 3) + 0] = point.p.x;
-            vertices[(i * 3) + 1] = point.p.y;
-            vertices[(i * 3) + 2] = point.p.z;
+                vertices[(i * 3) + 0] = point.p.x;
+                vertices[(i * 3) + 1] = point.p.y;
+                vertices[(i * 3) + 2] = point.p.z;
+            }
+            else {
+                vertices[(i * 3) + 0] = 0;
+                vertices[(i * 3) + 1] = 0;
+                vertices[(i * 3) + 2] = 0;
+            }
         }
 
         AglWireframe wireframe = (AglWireframe) highlightNode.getRenderable();
         wireframe.updateWithVertices(vertices, numVertices);
+
+        bus.post(new HighlightedHexTileChangedEvent(highlightTile));
+    }
+
+    public HexTile getHighlightTile() {
+        return highlightTile;
     }
 
     public AglWireframe makeHighlightRenderableWireframe() {

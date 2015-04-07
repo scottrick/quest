@@ -12,6 +12,8 @@ import android.widget.TextView;
 
 import com.hatfat.agl.app.AglActivity;
 import com.hatfat.agl.util.AglRandom;
+import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
 
 import java.util.List;
 
@@ -20,6 +22,7 @@ import javax.inject.Inject;
 import hatfat.com.quest.R;
 import hatfat.com.quest.hex.HexPlanetScene;
 import hatfat.com.quest.planet.HexTile;
+import hatfat.com.quest.planet.HighlightedHexTileChangedEvent;
 
 public class HexActivity extends AglActivity {
 
@@ -34,10 +37,15 @@ public class HexActivity extends AglActivity {
     private TextView levelTextView;
     private SeekBar seekBar;
 
+    private TextView desc1;
+    private TextView desc2;
+    private TextView desc3;
+
     private boolean isShowingMesh = true;
     private boolean isShowingWireframe = true;
 
     @Inject AglRandom random;
+    @Inject Bus bus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +56,10 @@ public class HexActivity extends AglActivity {
 
         View ourView = getLayoutInflater().inflate(R.layout.activity_test_layout, container, false);
         container.addView(ourView);
+
+        desc1 = (TextView) ourView.findViewById(R.id.activity_test_layout_desc1_textview);
+        desc2 = (TextView) ourView.findViewById(R.id.activity_test_layout_desc2_textview);
+        desc3 = (TextView) ourView.findViewById(R.id.activity_test_layout_desc3_textview);
 
         generateButton = (Button) ourView.findViewById(R.id.activity_test_layout_generate_button);
         generateButton.setOnClickListener(new View.OnClickListener() {
@@ -109,12 +121,15 @@ public class HexActivity extends AglActivity {
         });
 
         seekBar.setProgress(DEFAULT_PLANET_LEVEL);
+
+        bus.register(this);
     }
 
     private void setPlanetScene(HexPlanetScene newPlanetScene) {
         aglSurfaceView.setScene(newPlanetScene);
         planetScene = newPlanetScene;
         updateWireframeButton();
+        updateHighlightedTile(null);
 
         final GestureDetector gestureDetector = new GestureDetector(this, planetScene.getCamera());
         gestureDetector.setOnDoubleTapListener(new GestureDetector.OnDoubleTapListener() {
@@ -139,6 +154,24 @@ public class HexActivity extends AglActivity {
                 return true;
             }
         });
+    }
+
+    @Subscribe
+    public void handleHighlightedHexTileChangedEvent(HighlightedHexTileChangedEvent event) {
+        updateHighlightedTile(event.getTile());
+    }
+
+    private void updateHighlightedTile(HexTile tile) {
+        if (tile != null) {
+            desc1.setText(tile.getType().name());
+            desc2.setText(String.valueOf(tile.getNeighbors().size()));
+            desc3.setText("Unknown");
+        }
+        else {
+            desc1.setText("No Selection");
+            desc2.setText("");
+            desc3.setText("");
+        }
     }
 
     private void toggleMesh() {
