@@ -1,16 +1,16 @@
-package hatfat.com.quest.hex;
+package com.hatfat.quest.hex;
 
 import android.app.Application;
 
 import com.hatfat.agl.app.AglModule;
+import com.hatfat.quest.activities.HexActivity;
+import com.hatfat.quest.mesh.HexMeshManager;
+import com.hatfat.quest.planet.HexPlanet;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import hatfat.com.quest.activities.HexActivity;
-import hatfat.com.quest.mesh.HexMeshManager;
-import hatfat.com.quest.planet.HexPlanet;
 
 @Module
 (

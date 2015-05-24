@@ -1,4 +1,4 @@
-package hatfat.com.quest.cameras;
+package com.hatfat.quest.cameras;
 
 import android.view.GestureDetector;
 import android.view.InputDevice;
@@ -10,9 +10,8 @@ import com.hatfat.agl.AglOrthographicCamera;
 import com.hatfat.agl.mesh.AglPoint;
 import com.hatfat.agl.util.Quat;
 import com.hatfat.agl.util.Vec3;
-
-import hatfat.com.quest.planet.HexPlanet;
-import hatfat.com.quest.planet.HexTile;
+import com.hatfat.quest.planet.HexPlanet;
+import com.hatfat.quest.planet.HexTile;
 
 public class HexPlanetCamera extends AglOrthographicCamera implements GestureDetector.OnGestureListener, ScaleGestureDetector.OnScaleGestureListener {
 

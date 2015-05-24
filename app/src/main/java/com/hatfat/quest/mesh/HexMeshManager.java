@@ -1,4 +1,4 @@
-package hatfat.com.quest.mesh;
+package com.hatfat.quest.mesh;
 
 import android.app.Application;
 import android.util.Log;

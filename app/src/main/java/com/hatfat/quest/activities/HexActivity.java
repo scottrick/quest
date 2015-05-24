@@ -1,4 +1,4 @@
-package hatfat.com.quest.activities;
+package com.hatfat.quest.activities;
 
 import android.os.Bundle;
 import android.view.GestureDetector;
@@ -12,6 +12,9 @@ import android.widget.TextView;
 
 import com.hatfat.agl.app.AglActivity;
 import com.hatfat.agl.util.AglRandom;
+import com.hatfat.quest.hex.HexPlanetScene;
+import com.hatfat.quest.planet.HexTile;
+import com.hatfat.quest.planet.HighlightedHexTileChangedEvent;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -20,9 +23,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import hatfat.com.quest.R;
-import hatfat.com.quest.hex.HexPlanetScene;
-import hatfat.com.quest.planet.HexTile;
-import hatfat.com.quest.planet.HighlightedHexTileChangedEvent;
 
 public class HexActivity extends AglActivity {
 
@@ -30,29 +30,30 @@ public class HexActivity extends AglActivity {
 
     private HexPlanetScene planetScene;
 
-    private Button generateButton;
-    private Button meshButton;
-    private Button wireframeButton;
-    private Button focusButton;
+    private Button   generateButton;
+    private Button   meshButton;
+    private Button   wireframeButton;
+    private Button   focusButton;
     private TextView levelTextView;
-    private SeekBar seekBar;
+    private SeekBar  seekBar;
 
     private TextView desc1;
     private TextView desc2;
     private TextView desc3;
 
-    private boolean isShowingMesh = true;
+    private boolean isShowingMesh      = true;
     private boolean isShowingWireframe = true;
 
     @Inject AglRandom random;
-    @Inject Bus bus;
+    @Inject Bus       bus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         //put any subviews in this container view
-        RelativeLayout container = (RelativeLayout) findViewById(com.hatfat.agl.R.id.base_layout_content_view);
+        RelativeLayout container = (RelativeLayout) findViewById(
+                com.hatfat.agl.R.id.base_layout_content_view);
 
         View ourView = getLayoutInflater().inflate(R.layout.activity_test_layout, container, false);
         container.addView(ourView);
@@ -149,8 +150,11 @@ public class HexActivity extends AglActivity {
         final ScaleGestureDetector scaleDetector = new ScaleGestureDetector(this, planetScene.getCamera());
         aglSurfaceView.setOnTouchListener(new View.OnTouchListener() {
             @Override public boolean onTouch(View v, MotionEvent event) {
-                gestureDetector.onTouchEvent(event);
-                scaleDetector.onTouchEvent(event);
+                if (planetScene.isReadyToRender()) {
+                    gestureDetector.onTouchEvent(event);
+                    scaleDetector.onTouchEvent(event);
+                }
+
                 return true;
             }
         });

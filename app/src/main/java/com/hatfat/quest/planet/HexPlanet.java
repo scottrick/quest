@@ -1,4 +1,4 @@
-package hatfat.com.quest.planet;
+package com.hatfat.quest.planet;
 
 import android.content.Context;
 import android.util.Log;
@@ -14,6 +14,7 @@ import com.hatfat.agl.mesh.AglShape;
 import com.hatfat.agl.util.AglRandom;
 import com.hatfat.agl.util.Color;
 import com.hatfat.agl.util.Vec3;
+import com.hatfat.quest.mesh.HexMeshManager;
 import com.squareup.otto.Bus;
 
 import java.util.ArrayList;
@@ -24,21 +25,19 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import hatfat.com.quest.mesh.HexMeshManager;
-
 public class HexPlanet {
 
-    private AglNode meshNode = null;
+    private AglNode meshNode      = null;
     private AglNode wireframeNode = null;
     private AglNode highlightNode = null;
 
     private AglBBMesh shapeMesh = null;
 
     @Inject HexMeshManager meshManager;
-    @Inject Bus bus;
+    @Inject Bus            bus;
 
-    private HexTile highlightTile = null;
-    private List<HexTile> tiles = new ArrayList<>();
+    private HexTile       highlightTile = null;
+    private List<HexTile> tiles         = new ArrayList<>();
     private HashMap<AglShape, HexTile> shapeTileMap;
 
     private AglRandom random = new AglRandom();
@@ -71,19 +70,21 @@ public class HexPlanet {
             }
 
             generateTestTerrain(planetLevel);
-
-            AglWireframe wireframeRenderable = shapeMesh.toWireframeRenderable();
-            wireframeRenderable.setLineWidth(2.0f);
-            wireframeRenderable.setWireframeColor(new Color(0.15f, 0.15f, 0.15f, 1.0f));
-            AglColoredGeometry coloredRenderable = toColoredGeometryRenderable();
-
-            AglWireframe highlightWireframeRenderable = makeHighlightRenderableWireframe();
-
-            meshNode = new AglNode(new Vec3(0.0f, 0.0f, 0.0f), coloredRenderable);
-            wireframeNode = new AglNode(new Vec3(0.0f, 0.0f, 0.0f), wireframeRenderable);
-            highlightNode = new AglNode(new Vec3(0.0f, 0.0f, 0.0f), highlightWireframeRenderable);
-            highlightNode.setScale(new Vec3(1.002f, 1.002f, 1.002f));
         }
+    }
+
+    public void setupNodes() {
+        AglWireframe wireframeRenderable = shapeMesh.toWireframeRenderable();
+        wireframeRenderable.setLineWidth(2.0f);
+        wireframeRenderable.setWireframeColor(new Color(0.15f, 0.15f, 0.15f, 1.0f));
+        AglColoredGeometry coloredRenderable = toColoredGeometryRenderable();
+
+        AglWireframe highlightWireframeRenderable = makeHighlightRenderableWireframe();
+
+        meshNode = new AglNode(new Vec3(0.0f, 0.0f, 0.0f), coloredRenderable);
+        wireframeNode = new AglNode(new Vec3(0.0f, 0.0f, 0.0f), wireframeRenderable);
+        highlightNode = new AglNode(new Vec3(0.0f, 0.0f, 0.0f), highlightWireframeRenderable);
+        highlightNode.setScale(new Vec3(1.002f, 1.002f, 1.002f));
     }
 
     private void generateTestTerrain(int planetLevel) {

@@ -1,4 +1,4 @@
-package hatfat.com.quest.hex;
+package com.hatfat.quest.hex;
 
 import com.hatfat.agl.app.AglApplication;
 import com.hatfat.agl.app.AglModule;

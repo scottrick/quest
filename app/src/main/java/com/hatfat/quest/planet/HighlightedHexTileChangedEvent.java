@@ -1,4 +1,4 @@
-package hatfat.com.quest.planet;
+package com.hatfat.quest.planet;
 
 public class HighlightedHexTileChangedEvent {
 

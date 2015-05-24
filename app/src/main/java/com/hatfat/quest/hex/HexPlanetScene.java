@@ -1,25 +1,25 @@
-package hatfat.com.quest.hex;
+package com.hatfat.quest.hex;
 
 import android.content.Context;
 import android.opengl.GLES20;
-import android.util.Log;
 
 import com.hatfat.agl.AglScene;
+import com.hatfat.agl.app.AglRenderer;
 import com.hatfat.agl.util.Vec3;
-
-import hatfat.com.quest.cameras.HexPlanetCamera;
-import hatfat.com.quest.planet.HexPlanet;
-import hatfat.com.quest.planet.HexTile;
+import com.hatfat.quest.cameras.HexPlanetCamera;
+import com.hatfat.quest.planet.HexPlanet;
+import com.hatfat.quest.planet.HexTile;
 
 public class HexPlanetScene extends AglScene {
 
     private HexPlanet planet;
 
-    private int planetLevel;
+    private int     planetLevel;
     private boolean meshInitiallyVisible;
     private boolean wireframeInitiallyVisible;
 
-    public HexPlanetScene(Context context, int planetLevel, boolean meshInitiallyVisible, boolean wireframeInitiallyVisible) {
+    public HexPlanetScene(Context context, int planetLevel, boolean meshInitiallyVisible,
+            boolean wireframeInitiallyVisible) {
         super(context);
 
         this.planetLevel = planetLevel;
@@ -35,29 +35,30 @@ public class HexPlanetScene extends AglScene {
     }
 
     @Override
-    public void setupScene() {
-        super.setupScene();
+    protected void setupSceneBackgroundWork() {
+        super.setupSceneBackgroundWork();
+
+        planet = new HexPlanet(getContext(), planetLevel);
+        getCamera().setPlanet(planet);
+    }
+
+    @Override
+    protected void setupSceneGLWork(AglRenderer renderer) {
+        super.setupSceneGLWork(renderer);
 
         GLES20.glEnable(GLES20.GL_POLYGON_OFFSET_FILL);
         GLES20.glPolygonOffset(1.0f, 1.0f);
 
-        long setupStartTime = System.currentTimeMillis();
-
-        planet = new HexPlanet(getContext(), planetLevel);
-        getCamera().setPlanet(planet);
+        planet.setupNodes();
         addNodes(planet.getNodes());
 
         planet.getMeshNode().setShouldRender(meshInitiallyVisible);
         planet.getWireframeNode().setShouldRender(wireframeInitiallyVisible);
-
-        long setupEndTime = System.currentTimeMillis();
-
-        Log.i("HexPlanetScene", " HexPlanetScene setup took " + (setupEndTime - setupStartTime) + " milliseconds.");
     }
 
     @Override
-    public void destroyScene() {
-        super.destroyScene();
+    public void destroyScene(AglRenderer renderer) {
+        super.destroyScene(renderer);
 
         GLES20.glPolygonOffset(0.0f, 0.0f);
         GLES20.glDisable(GLES20.GL_POLYGON_OFFSET_FILL);

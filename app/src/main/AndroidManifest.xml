@@ -2,14 +2,14 @@
           package="hatfat.com.quest">
 
     <application
-            android:name=".hex.HexApplication"
+            android:name="com.hatfat.quest.hex.HexApplication"
             android:allowBackup="true"
             android:label="@string/app_name"
             android:icon="@mipmap/ic_launcher"
             android:theme="@style/AglTheme">
 
             <activity
-                android:name=".activities.HexActivity"
+                android:name="com.hatfat.quest.activities.HexActivity"
                 android:screenOrientation="portrait"
                 android:label="@string/app_name" >
 

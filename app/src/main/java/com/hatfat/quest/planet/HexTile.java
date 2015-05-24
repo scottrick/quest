@@ -1,4 +1,4 @@
-package hatfat.com.quest.planet;
+package com.hatfat.quest.planet;
 
 import com.hatfat.agl.mesh.AglShape;
 import com.hatfat.agl.util.AglRandom;

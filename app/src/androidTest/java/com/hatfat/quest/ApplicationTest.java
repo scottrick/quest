@@ -1,4 +1,4 @@
-package hatfat.com.quest;
+package com.hatfat.quest;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
