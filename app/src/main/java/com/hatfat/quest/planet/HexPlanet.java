@@ -3,14 +3,14 @@ package com.hatfat.quest.planet;
 import android.content.Context;
 import android.util.Log;
 
-import com.hatfat.agl.AglColoredGeometry;
 import com.hatfat.agl.AglNode;
-import com.hatfat.agl.AglWireframe;
 import com.hatfat.agl.app.AglApplication;
 import com.hatfat.agl.mesh.AglBBMesh;
 import com.hatfat.agl.mesh.AglMesh;
 import com.hatfat.agl.mesh.AglPoint;
 import com.hatfat.agl.mesh.AglShape;
+import com.hatfat.agl.render.AglColoredGeometry;
+import com.hatfat.agl.render.AglWireframe;
 import com.hatfat.agl.util.AglRandom;
 import com.hatfat.agl.util.Color;
 import com.hatfat.agl.util.Vec3;

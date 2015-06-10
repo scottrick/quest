@@ -29,7 +29,7 @@ public class HexPlanetScene extends AglScene {
         HexPlanetCamera camera = new HexPlanetCamera();
         setCamera(camera);
 
-        Vec3 newLightDir = new Vec3(0.1f, 0.1f, 1.0f);
+        Vec3 newLightDir = new Vec3(0.25f, 0.35f, 1.0f);
         newLightDir.normalize();
         getGlobalLight().lightDir = newLightDir;
     }

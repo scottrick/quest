@@ -11,12 +11,14 @@ public class HexTile {
 
     public enum HexTileType {
         LAND(new Color(0.55f, 0.27f, 0.07f, 1.0f)),
-        WATER(new Color(0.0f, 0.0f, 0.6f, 1.0f)),
+        WATER(new Color(0.0f, 0.0f, 0.5f, 1.0f)),
 
         GRASSLAND(new Color(0.2f, 0.8f, 0.2f, 1.0f)),
         PLAINS(new Color(0.91f, 0.89f, 0.81f, 1.0f)),
         FOREST(new Color(0.13f, 0.55f, 0.13f, 1.0f)),
         MOUNTAIN(new Color(0.44f, 0.5f, 0.57f, 1.0f)),
+
+        UNKNOWN(new Color(0.1f, 0.1f, 0.1f, 1.0f)),
 
         NO_TYPE(new Color(1.0f, 0.0f, 1.0f, 1.0f));
 
@@ -26,12 +28,8 @@ public class HexTile {
             this.color = color;
         }
 
-        public static int getNumBasicTypes() {
-            return 2;
-        }
-
         public static int getNumTypes() {
-            return 6;
+            return NO_TYPE.ordinal();
         }
 
         public Color getColor() {
@@ -52,6 +50,8 @@ public class HexTile {
                     return MOUNTAIN;
                 case 5:
                     return GRASSLAND;
+                case 6:
+                    return UNKNOWN;
 
                 default:
                     return NO_TYPE;
