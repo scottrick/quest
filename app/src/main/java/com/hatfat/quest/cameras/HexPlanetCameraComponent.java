@@ -5,15 +5,20 @@ import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 
-import com.hatfat.agl.AglNode;
-import com.hatfat.agl.AglOrthographicCamera;
+import com.hatfat.agl.component.ComponentType;
+import com.hatfat.agl.component.camera.OrthographicCameraComponent;
+import com.hatfat.agl.component.transform.Transform;
 import com.hatfat.agl.mesh.AglPoint;
 import com.hatfat.agl.util.Quat;
 import com.hatfat.agl.util.Vec3;
 import com.hatfat.quest.planet.HexPlanet;
 import com.hatfat.quest.planet.HexTile;
 
-public class HexPlanetCamera extends AglOrthographicCamera implements GestureDetector.OnGestureListener, ScaleGestureDetector.OnScaleGestureListener {
+import java.util.List;
+
+public class HexPlanetCameraComponent
+        extends OrthographicCameraComponent
+        implements GestureDetector.OnGestureListener, ScaleGestureDetector.OnScaleGestureListener {
 
     private HexPlanet planet;
 
@@ -26,7 +31,7 @@ public class HexPlanetCamera extends AglOrthographicCamera implements GestureDet
 
     private static final float eyeDist = 2.0f;
 
-    public HexPlanetCamera() {
+    public HexPlanetCameraComponent() {
         super(new Vec3(0.0f, 0.0f, eyeDist),
                 new Vec3(0.0f, 0.0f, 0.0f),
                 new Vec3(0.0f, 1.0f, 0.0f),
@@ -66,8 +71,9 @@ public class HexPlanetCamera extends AglOrthographicCamera implements GestureDet
         rotation.setWithRotationInRadians(angleRadians, axis);
 
         if (planet != null) {
-            for (AglNode node : planet.getNodes()) {
-                node.posQuat.quat = new Quat(rotation);
+            List<Transform> transforms = planet.getComponentsByType(ComponentType.TRANSFORM);
+            for (Transform transform : transforms) {
+                transform.posQuat.quat = new Quat(rotation);
             }
         }
     }
@@ -82,8 +88,9 @@ public class HexPlanetCamera extends AglOrthographicCamera implements GestureDet
         rotation.setWithRotationInDegrees(magnitude / 20.0f, axis);
 
         if (planet != null) {
-            for (AglNode node : planet.getNodes()) {
-                node.posQuat.quat.rotateBy(rotation);
+            List<Transform> transforms = planet.getComponentsByType(ComponentType.TRANSFORM);
+            for (Transform transform : transforms) {
+                transform.posQuat.quat.rotateBy(rotation);
             }
         }
     }
@@ -127,7 +134,8 @@ public class HexPlanetCamera extends AglOrthographicCamera implements GestureDet
         Vec3 point = new Vec3(xValue, yValue, zValue);
 
         //need to ROTATE point
-        point.rotateBy(planet.getMeshNode().posQuat.quat.getInverse());
+        Transform transform = planet.getComponentByType(ComponentType.TRANSFORM);
+        point.rotateBy(transform.posQuat.quat.getInverse());
 
         HexTile focusTile = planet.findTileClosestToPoint(point);
 

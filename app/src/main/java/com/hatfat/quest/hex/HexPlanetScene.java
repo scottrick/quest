@@ -5,8 +5,11 @@ import android.opengl.GLES20;
 
 import com.hatfat.agl.AglScene;
 import com.hatfat.agl.app.AglRenderer;
+import com.hatfat.agl.component.ComponentType;
+import com.hatfat.agl.component.transform.Transform;
+import com.hatfat.agl.entity.AglEntity;
 import com.hatfat.agl.util.Vec3;
-import com.hatfat.quest.cameras.HexPlanetCamera;
+import com.hatfat.quest.cameras.HexPlanetCameraComponent;
 import com.hatfat.quest.planet.HexPlanet;
 import com.hatfat.quest.planet.HexTile;
 
@@ -20,18 +23,23 @@ public class HexPlanetScene extends AglScene {
 
     public HexPlanetScene(Context context, int planetLevel, boolean meshInitiallyVisible,
             boolean wireframeInitiallyVisible) {
-        super(context);
+        super(context, false);
 
         this.planetLevel = planetLevel;
         this.meshInitiallyVisible = meshInitiallyVisible;
         this.wireframeInitiallyVisible = wireframeInitiallyVisible;
 
-        HexPlanetCamera camera = new HexPlanetCamera();
-        setCamera(camera);
+        /* setup the camera */
+        AglEntity cameraEntity = new AglEntity("HexPlanet Camera Entity");
+        cameraEntity.addComponent(new HexPlanetCameraComponent());
+        addCameraEntity(cameraEntity);
 
+        /* update the light position */
         Vec3 newLightDir = new Vec3(0.25f, 0.35f, 1.0f);
         newLightDir.normalize();
-        getGlobalLight().lightDir = newLightDir;
+
+        Transform lightTransform = getGlobalLight().getComponentByType(ComponentType.TRANSFORM);
+        lightTransform.posQuat.pos = newLightDir;
     }
 
     @Override
@@ -49,11 +57,11 @@ public class HexPlanetScene extends AglScene {
         GLES20.glEnable(GLES20.GL_POLYGON_OFFSET_FILL);
         GLES20.glPolygonOffset(1.0f, 1.0f);
 
-        planet.setupNodes();
-        addNodes(planet.getNodes());
+        planet.setupComponents();
+        addEntity(planet);
 
-        planet.getMeshNode().setShouldRender(meshInitiallyVisible);
-        planet.getWireframeNode().setShouldRender(wireframeInitiallyVisible);
+        planet.getMeshComponent().setShouldRender(meshInitiallyVisible);
+        planet.getWireframeComponent().setShouldRender(wireframeInitiallyVisible);
     }
 
     @Override
@@ -69,8 +77,8 @@ public class HexPlanetScene extends AglScene {
         planet.setHighlightTile(tile);
     }
 
-    public HexPlanetCamera getCamera() {
-        return (HexPlanetCamera) super.getCamera();
+    public HexPlanetCameraComponent getCamera() {
+        return (HexPlanetCameraComponent) super.getCamera();
     }
 
     public HexPlanet getPlanet() {
@@ -79,19 +87,19 @@ public class HexPlanetScene extends AglScene {
 
     public void toggleMesh() {
         if (planet != null) {
-            planet.getMeshNode().setShouldRender(!isMeshVisible());
+            planet.getMeshComponent().setShouldRender(!isMeshVisible());
         }
     }
 
     public void toggleWireframe() {
         if (planet != null) {
-            planet.getWireframeNode().setShouldRender(!isWireframeVisible());
+            planet.getWireframeComponent().setShouldRender(!isWireframeVisible());
         }
     }
 
     public boolean isMeshVisible() {
         if (planet != null) {
-            return planet.getMeshNode().shouldRender();
+            return planet.getMeshComponent().shouldRender();
         }
         else {
             return meshInitiallyVisible;
@@ -100,7 +108,7 @@ public class HexPlanetScene extends AglScene {
 
     public boolean isWireframeVisible() {
         if (planet != null) {
-            return planet.getWireframeNode().shouldRender();
+            return planet.getWireframeComponent().shouldRender();
         }
         else {
             return wireframeInitiallyVisible;

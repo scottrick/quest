@@ -3,8 +3,10 @@ package com.hatfat.quest.planet;
 import android.content.Context;
 import android.util.Log;
 
-import com.hatfat.agl.AglNode;
 import com.hatfat.agl.app.AglApplication;
+import com.hatfat.agl.component.RenderableComponent;
+import com.hatfat.agl.component.transform.Transform;
+import com.hatfat.agl.entity.AglEntity;
 import com.hatfat.agl.mesh.AglBBMesh;
 import com.hatfat.agl.mesh.AglMesh;
 import com.hatfat.agl.mesh.AglPoint;
@@ -25,11 +27,11 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-public class HexPlanet {
+public class HexPlanet extends AglEntity {
 
-    private AglNode meshNode      = null;
-    private AglNode wireframeNode = null;
-    private AglNode highlightNode = null;
+    private RenderableComponent meshComponent;
+    private RenderableComponent wireframeComponent;
+    private RenderableComponent highlightComponent;
 
     private AglBBMesh shapeMesh = null;
 
@@ -73,7 +75,7 @@ public class HexPlanet {
         }
     }
 
-    public void setupNodes() {
+    public void setupComponents() {
         AglWireframe wireframeRenderable = shapeMesh.toWireframeRenderable();
         wireframeRenderable.setLineWidth(2.0f);
         wireframeRenderable.setWireframeColor(new Color(0.15f, 0.15f, 0.15f, 1.0f));
@@ -81,10 +83,16 @@ public class HexPlanet {
 
         AglWireframe highlightWireframeRenderable = makeHighlightRenderableWireframe();
 
-        meshNode = new AglNode(new Vec3(0.0f, 0.0f, 0.0f), coloredRenderable);
-        wireframeNode = new AglNode(new Vec3(0.0f, 0.0f, 0.0f), wireframeRenderable);
-        highlightNode = new AglNode(new Vec3(0.0f, 0.0f, 0.0f), highlightWireframeRenderable);
-        highlightNode.setScale(new Vec3(1.002f, 1.002f, 1.002f));
+        Transform transform = new Transform();
+        meshComponent = new RenderableComponent(coloredRenderable);
+        wireframeComponent = new RenderableComponent(wireframeRenderable);
+        highlightComponent = new RenderableComponent(highlightWireframeRenderable);
+
+        addComponent(transform);
+        addComponent(meshComponent);
+        addComponent(wireframeComponent);
+        addComponent(highlightComponent);
+//        highlightNode.setScale(new Vec3(1.002f, 1.002f, 1.002f));
     }
 
     private void generateTestTerrain(int planetLevel) {
@@ -138,7 +146,8 @@ public class HexPlanet {
 
         long generateEndTime = System.currentTimeMillis();
 
-        Log.i("HexPlanet", "[" + planetLevel + "] generateTestTerrain took " + (generateEndTime - generateStartTime) + " milliseconds.");
+        Log.i("HexPlanet", "[" + planetLevel + "] generateTestTerrain took " + (generateEndTime
+                - generateStartTime) + " milliseconds.");
     }
 
     public HexTile findTileClosestToPoint(Vec3 point) {
@@ -256,7 +265,7 @@ public class HexPlanet {
             }
         }
 
-        AglWireframe wireframe = (AglWireframe) highlightNode.getRenderable();
+        AglWireframe wireframe = (AglWireframe) highlightComponent.getRenderable();
         wireframe.updateWithVertices(vertices, numVertices);
 
         bus.post(new HighlightedHexTileChangedEvent(highlightTile));
@@ -285,33 +294,16 @@ public class HexPlanet {
         return wireframe;
     }
 
-    private void setMeshNode(AglNode meshNode) {
-        this.meshNode = meshNode;
-    }
-
-    private void setWireframeNode(AglNode wireframeNode) {
-        this.wireframeNode = wireframeNode;
-    }
-
     public AglMesh getMesh() {
         return shapeMesh;
     }
 
-    public AglNode getMeshNode() {
-        return meshNode;
+    public RenderableComponent getMeshComponent() {
+        return meshComponent;
     }
 
-    public AglNode getWireframeNode() {
-        return wireframeNode;
-    }
-
-    public List<AglNode> getNodes() {
-        List<AglNode> nodes = new LinkedList<>();
-        nodes.add(meshNode);
-        nodes.add(wireframeNode);
-        nodes.add(highlightNode);
-
-        return nodes;
+    public RenderableComponent getWireframeComponent() {
+        return wireframeComponent;
     }
 
     public List<HexTile> getTiles() {

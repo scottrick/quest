@@ -22,24 +22,28 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import hatfat.com.quest.R;
 
 public class HexActivity extends AglActivity {
 
     private static final int DEFAULT_PLANET_LEVEL = 3;
 
+    /* the planet scene we are showing */
     private HexPlanetScene planetScene;
 
-    private Button   generateButton;
-    private Button   meshButton;
-    private Button   wireframeButton;
-    private Button   focusButton;
-    private TextView levelTextView;
-    private SeekBar  seekBar;
+    @Bind(R.id.activity_test_layout_generate_button) Button generateButton;
+    @Bind(R.id.activity_test_layout_mesh_button) Button meshButton;
+    @Bind(R.id.activity_test_layout_wireframe_button) Button wireframeButton;
+    @Bind(R.id.activity_test_layout_focus_button) Button focusButton;
+    @Bind(R.id.activity_test_layout_level_textview) TextView levelTextView;
+    @Bind(R.id.activity_test_layout_level_seekbar) SeekBar seekBar;
 
-    private TextView desc1;
-    private TextView desc2;
-    private TextView desc3;
+    @Bind(R.id.activity_test_layout_desc1_textview) TextView desc1;
+    @Bind(R.id.activity_test_layout_desc2_textview) TextView desc2;
+    @Bind(R.id.activity_test_layout_desc3_textview) TextView desc3;
 
     private boolean isShowingMesh      = true;
     private boolean isShowingWireframe = true;
@@ -58,51 +62,9 @@ public class HexActivity extends AglActivity {
         View ourView = getLayoutInflater().inflate(R.layout.activity_test_layout, container, false);
         container.addView(ourView);
 
-        desc1 = (TextView) ourView.findViewById(R.id.activity_test_layout_desc1_textview);
-        desc2 = (TextView) ourView.findViewById(R.id.activity_test_layout_desc2_textview);
-        desc3 = (TextView) ourView.findViewById(R.id.activity_test_layout_desc3_textview);
+        /* inject our views */
+        ButterKnife.bind(this);
 
-        generateButton = (Button) ourView.findViewById(R.id.activity_test_layout_generate_button);
-        generateButton.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
-                int newLevel = seekBar.getProgress() + 1;
-                levelTextView.setText("level " + newLevel);
-                HexPlanetScene newPlanetScene = new HexPlanetScene(getApplicationContext(), newLevel, isShowingMesh, isShowingWireframe);
-                setPlanetScene(newPlanetScene);
-            }
-        });
-
-        meshButton = (Button) ourView.findViewById(R.id.activity_test_layout_mesh_button);
-        meshButton.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
-                toggleMesh();
-            }
-        });
-
-        wireframeButton = (Button) ourView.findViewById(R.id.activity_test_layout_wireframe_button);
-        wireframeButton.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
-                toggleWireframe();
-            }
-        });
-
-        focusButton = (Button) ourView.findViewById(R.id.activity_test_layout_focus_button);
-        focusButton.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
-                if (planetScene.getPlanet() == null) {
-                    return;
-                }
-
-                List<HexTile> tiles = planetScene.getPlanet().getTiles();
-                int randomTileIndex = random.get().nextInt(tiles.size());
-                HexTile randomTile = tiles.get(randomTileIndex);
-                planetScene.focusTile(randomTile);
-            }
-        });
-
-        levelTextView = (TextView) ourView.findViewById(R.id.activity_test_layout_level_textview);
-
-        seekBar = (SeekBar) ourView.findViewById(R.id.activity_test_layout_level_seekbar);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar seekBar, int progress,
                     boolean fromUser) {
@@ -124,6 +86,36 @@ public class HexActivity extends AglActivity {
         seekBar.setProgress(DEFAULT_PLANET_LEVEL);
 
         bus.register(this);
+    }
+
+    @OnClick(R.id.activity_test_layout_generate_button)
+    public void onGenerateClicked(View view) {
+        int newLevel = seekBar.getProgress() + 1;
+        levelTextView.setText("level " + newLevel);
+        HexPlanetScene newPlanetScene = new HexPlanetScene(getApplicationContext(), newLevel, isShowingMesh, isShowingWireframe);
+        setPlanetScene(newPlanetScene);
+    }
+
+    @OnClick(R.id.activity_test_layout_mesh_button)
+    public void onMeshClicked(View view) {
+        toggleMesh();
+    }
+
+    @OnClick(R.id.activity_test_layout_wireframe_button)
+    public void onWireframeClicked(View view) {
+        toggleWireframe();
+    }
+
+    @OnClick(R.id.activity_test_layout_focus_button)
+    public void onFocusClicked(View view) {
+        if (planetScene.getPlanet() == null) {
+            return;
+        }
+
+        List<HexTile> tiles = planetScene.getPlanet().getTiles();
+        int randomTileIndex = random.get().nextInt(tiles.size());
+        HexTile randomTile = tiles.get(randomTileIndex);
+        planetScene.focusTile(randomTile);
     }
 
     private void setPlanetScene(HexPlanetScene newPlanetScene) {
