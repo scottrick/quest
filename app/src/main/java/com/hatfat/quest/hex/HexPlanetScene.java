@@ -3,8 +3,8 @@ package com.hatfat.quest.hex;
 import android.content.Context;
 import android.opengl.GLES20;
 
-import com.hatfat.agl.AglScene;
 import com.hatfat.agl.app.AglRenderer;
+import com.hatfat.agl.base.AglScene;
 import com.hatfat.agl.component.ComponentType;
 import com.hatfat.agl.component.transform.Transform;
 import com.hatfat.agl.entity.AglEntity;
